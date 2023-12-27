@@ -180,6 +180,10 @@ function startGame() {
     if (paddleX[paddleIndex] > (width - paddleWidth)) {
       paddleX[paddleIndex] = width - paddleWidth;
     }
+
+    socket.emit('paddleMove', {
+      xPosition: paddleX[paddleIndex]
+    })
     // Hide Cursor
     canvas.style.cursor = 'none';
   });
@@ -196,4 +200,9 @@ socket.on('startGame', (refereeId)=>{
   console.log('Referee is', refereeId)
   isReferee = refereeId === socket.id
   startGame()
+})
+
+socket.on('paddleMove', (paddleData)=>{
+ const opponentIndex = 1 - paddleIndex
+ paddleX[opponentIndex] = paddleData.xPosition
 })
