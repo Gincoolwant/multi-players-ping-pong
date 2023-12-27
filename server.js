@@ -16,10 +16,9 @@ let readyPlayerCount = 0
 io.on('connect', (socket) => {
   console.log('User is connected:', socket.id)
   
-  readyPlayerCount++
-  
   socket.on('ready', ()=>{
     console.log('Player ready:', socket.id)
+    readyPlayerCount++
 
     if (readyPlayerCount === 2){
       const refereeId = socket.id
