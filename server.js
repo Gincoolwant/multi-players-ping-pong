@@ -11,6 +11,19 @@ server.listen(PORT, ()=>{
   console.log(`Listening on port ${PORT}...`)
 })
 
+let readyPlayerCount = 0
+
 io.on('connect', (socket) => {
-  console.log('user is connected.', socket.id)
+  console.log('User is connected:', socket.id)
+  
+  readyPlayerCount++
+  
+  socket.on('ready', ()=>{
+    console.log('Player ready:', socket.id)
+
+    if (readyPlayerCount === 2){
+      const refereeId = socket.id
+      io.emit('startGame', refereeId)
+    }
+  })
 })
