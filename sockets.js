@@ -1,29 +1,34 @@
 let readyPlayerCount = 0
 
 function listen(io) {
-  io.on('connect', (socket) => {
+  const pingPongNamespace = io.of('/pingPong')
+  pingPongNamespace.on('connect', (socket) => {
     console.log('User is connected:', socket.id)
+    let room
 
     socket.on('ready', () => {
-      console.log('Player ready:', socket.id)
+      room = 'room' + Math.floor(readyPlayerCount / 2)
+      socket.join(room)
+      console.log('Player ready:', socket.id, room)
       readyPlayerCount++
 
-      if (readyPlayerCount === 2) {
+      if (readyPlayerCount % 2 === 0) {
         const refereeId = socket.id
-        io.emit('startGame', refereeId)
+        pingPongNamespace.in(room).emit('startGame', refereeId)
       }
     })
 
     socket.on('paddleMove', (paddleData) => {
-      socket.broadcast.emit('paddleMove', paddleData)
+      socket.to(room).emit('paddleMove', paddleData)
     })
 
     socket.on('ballMove', (ballData) => {
-      socket.broadcast.emit('ballMove', ballData)
+      socket.to(room).emit('ballMove', ballData)
     })
 
     socket.on('disconnect', (reason) => {
       console.log(`User disconnected ${socket.id}: ${reason}`)
+      socket.leave(room)
     })
   })
 }
