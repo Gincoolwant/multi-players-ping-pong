@@ -1,7 +1,7 @@
 // Canvas Related 
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
-const socket = io('http://localhost:3000/');
+const socket = io();
 let paddleIndex = 0;
 let isReferee = false
 
@@ -221,4 +221,13 @@ socket.on('paddleMove', (paddleData)=> {
 
 socket.on('ballMove', (ballData) => {
   ({ ballX, ballY, score } = ballData)
+})
+
+socket.on('disconnect', (reason) => {
+  console.log(reason)
+  if (reason === "io server disconnect") {
+    // the disconnection was initiated by the server, you need to reconnect manually
+    socket.connect()
+  }
+  // else the socket will automatically try to reconnect
 })
